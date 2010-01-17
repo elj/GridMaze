@@ -135,30 +135,12 @@ function HighlightNearestWall(e) {
 	var x = e.clientX - 8;
 	var y = e.clientY - 8;
 	
-	var debugText = 'not near a wall ';
+	var wall = GetWallFromCoordinates(x, y);
 	
-	var wall = [];
-	
-	if ((x > 325) || (y > 325)) {
-		debugText = 'not near a wall ';
-	} else if ((x % 100 > 25) && (x % 100 < 75)) {		//test for proximity to horizontal wall
-		if ((y % 100 < 25) || (y % 100 > 75)) {
-			var quadX = Math.round((x-26)/100);
-			var quadY = Math.round(y/100);
-			debugText = 'near horizontal wall [' + quadX + '][' + quadY + '] ';
-			wall = [0, quadX, quadY];
-		}
-	} else if ((x % 100 < 25) || (x % 100 > 75)) {		//test for proximity to vertical wall
-		if ((y % 100 > 25) && (y % 100 < 75)) {
-			var quadX = Math.round(x/100);
-			var quadY = Math.round((y-26)/100);
-			debugText = 'near vertical wall [' + quadY + '][' + quadX + '] ';
-			wall = [1, quadY, quadX];
-		}
+	if (wall != []) {
+		draw();
+		DrawWall(wall, "rgb(255,255,0)");
 	}
-	
-	draw();
-	DrawWall(wall, "rgb(255,255,0)");
 	
 	print('output', debugText + x + ', ' + y);
 
@@ -171,58 +153,39 @@ function ClickToToggleWall(e) {
 	
 	print('clickX', x);
 	print('clickY', y);
-	var debugText = 'click not near a wall ';
 	
-	if ((x > 325) || (y > 325)) {
-		debugText = 'click not near a wall ';
-	} else if ((x % 100 > 25) && (x % 100 < 75)) {		//test for proximity to horizontal wall
-		if ((y % 100 < 25) || (y % 100 > 75)) {
-			var quadX = Math.round((x-26)/100);
-			var quadY = Math.round(y/100);
-			debugText = 'click near horizontal wall [' + quadX + '][' + quadY + '] ';
-			Walls[0][quadX][quadY] = !Walls[0][quadX][quadY];
-		}
-	} else if ((x % 100 < 25) || (x % 100 > 75)) {		//test for proximity to vertical wall
-		if ((y % 100 > 25) && (y % 100 < 75)) {
-			var quadX = Math.round(x/100);
-			var quadY = Math.round((y-26)/100);
-			debugText = 'click near vertical wall [' + quadY + '][' + quadX + '] ';
-			Walls[1][quadY][quadX] = !Walls[1][quadY][quadX];
-		}
-	}
+	var w = GetWallFromCoordinates(x, y);
+	
+	if (w != [])
+		Walls[w[0]][w[1]][w[2]] = !Walls[w[0]][w[1]][w[2]];
 	
 	draw();
 	print('output', debugText + x + ', ' + y);
-	
-	
-	/*
-	//test whether click was within the drawn grid
-	if (x > (Walls[0].length*100) + 50) {
-		print('output', 'x is outside the grid'); //+ (Walls[0].length*100 + 50));
-		return;
-	}
-	if (y > (Walls[0][0].length*100) + 50) {
-		print('output', 'y is outside the grid');
-		return;
-	}
-		
-	//
-	var quadX = Math.round((Math.min(x,298)-49)/100);
-	
-	var quadY = Math.round(y/100);
-	
-	if (x > quadX*100+25 && x < quadX*100+75 && y > quadY*100-25 && y < quadY*100+25) {
-		Walls[0][quadX][quadY] = !Walls[0][quadX][quadY];
-		draw();
-	}
-	
-	if (x > quadX*100-25 && x < quadX*100+25 && y > quadY*100+25 && y < quadY*100+75) {
-		Walls[1][quadY][quadX] = !Walls[1][quadY][quadX];
-		draw();
-	}
-	*/
 }
 
+
+function GetWallFromCoordinates(x, y) {
+	var quadX;
+	var quadY;
+	
+	if ((x > 325) || (y > 325)) {
+		return [];
+	} else if ((x % 100 > 25) && (x % 100 < 75)) {		//test for proximity to horizontal wall
+		if ((y % 100 < 25) || (y % 100 > 75)) {
+			quadX = Math.round((x-26)/100);
+			quadY = Math.round(y/100);
+			return [0, quadX, quadY];
+		}
+	} else if ((x % 100 < 25) || (x % 100 > 75)) {		//test for proximity to vertical wall
+		if ((y % 100 > 25) && (y % 100 < 75)) {
+			quadX = Math.round(x/100);
+			quadY = Math.round((y-26)/100);
+			return [1, quadY, quadX];
+		}
+	}
+	return [];
+	
+}
 
 
 function updateHoverCoordinates(e) {
