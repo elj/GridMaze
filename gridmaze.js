@@ -41,7 +41,7 @@ Walls[1] = VerticalWall;
 	
 function IsSurroundedByWalls(x, y) {
 	var topAndBottom = Walls[0][x][y] && Walls[0][x][y+1];
-	var sides = Walls[1][y][x] && Walls[1][y+1][x];
+	var sides = Walls[1][y][x] && Walls[1][y][x+1];
 	return sides && topAndBottom;
 }
 
@@ -50,13 +50,13 @@ function CalculateEnclosure() {
 	var result = Create2DArray(3, 3, false);
 	
 	//var active = Create2DArray(3, 3, cellStatusType.unknown);
-	/*
+	
 	for (var x=0; x<result.length; x++) {
 		for (var y=0; y<result[0].length; y++) {
 			result[x][y] = IsSurroundedByWalls(x, y);
 		}	
 	}
-	*/
+	
 	return result;
 }
 
@@ -137,8 +137,9 @@ function HighlightNearestWall(e) {
 	
 	var wall = GetWallFromCoordinates(x, y);
 	
-	if (wall != []) {
-		draw();
+	draw();
+	
+	if (wall != null) {
 		DrawWall(wall, "rgb(255,255,0)");
 	}
 	
@@ -169,7 +170,7 @@ function GetWallFromCoordinates(x, y) {
 	var quadY;
 	
 	if ((x > 325) || (y > 325)) {
-		return [];
+		return null;
 	} else if ((x % 100 > 25) && (x % 100 < 75)) {		//test for proximity to horizontal wall
 		if ((y % 100 < 25) || (y % 100 > 75)) {
 			quadX = Math.round((x-26)/100);
@@ -183,7 +184,7 @@ function GetWallFromCoordinates(x, y) {
 			return [1, quadY, quadX];
 		}
 	}
-	return [];
+	return null;
 	
 }
 
