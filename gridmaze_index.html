@@ -2,10 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
         <script src="gridmaze.js" type="text/javascript"></script>
+        <script src="raphael-min.js" type="text/javascript"></script>
     </head>
     <body onload="draw()">
-        <canvas id="canvas" width="600" height="600"></canvas>
+        <canvas id="canvas" width="302" height="302"></canvas>
         <br />
+        <button onClick="RotateLeft()">Rotate Left</button>
+        <button onClick="RotateRight()">Rotate Right</button>
+        <button onClick="InsertCat()">Cat</button>
+        <br/><br />
+        
         <p>Hover: <b id="hoverX">x</b><b>,</b> <b id="hoverY">y</b></p>
         <p>Last Click: <b id="clickX">x</b><b>,</b> <b id="clickY">y</b></p>
         <font color="red"><p id="output"> </p></font>
