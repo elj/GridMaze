@@ -1,24 +1,10 @@
 
+/**************************\
+** Initialize Wall Arrays **
+\**************************/
 
-function Create2DArray(columns, rows, value) {
-  var arr = [];
-
-  for (var c=0;c<columns;c++) {
-     arr[c] = [];
-     for (var r=0;r<rows;r++) {
-     	arr[c][r] = value;
-     }
-  }
-
-  return arr;
-}
-
-
-// initialize wall arrays
 var HorizontalWall = Create2DArray(3, 4, false);
 var VerticalWall = Create2DArray(3, 4, false);
-var coordX = 0;
-var coordY = 0;
 
 // setup initial wall positions
 HorizontalWall[0][0] = true;
@@ -51,15 +37,55 @@ var Walls = [];
 Walls[0] = HorizontalWall;
 Walls[1] = VerticalWall;
 
+function Create2DArray(columns, rows, value) {
+  var arr = [];
 
+  for (var c=0;c<columns;c++) {
+     arr[c] = [];
+     for (var r=0;r<rows;r++) {
+     	arr[c][r] = value;
+     }
+  }
+
+  return arr;
+}
+
+var activeCanvas;
+
+function setEditTilesEnvironment() {
+// called onload - needs to eventually set parameters to make walls editable
+	
+	SetActiveCanvas("canvas00");
+	draw();
+	
+	var canvas2 = document.getElementById("canvas10");
+	drawAnotherCanvas(canvas2);
+}
+
+function SetActiveCanvas(canvasName) {
+	activeCanvas = document.getElementById(canvasName);
+	
+}
+
+function GetContextFromActiveCanvas() {
+	return activeCanvas.getContext("2d");
+}
 
 /**********************************\
 ** Draw Current Walls and Squares **
 \**********************************/
 
+function drawAnotherCanvas(canvas) {
+	var ctx = canvas.getContext("2d");
+	
+	ctx.fillStyle = "rgb(255,255,0)";
+	ctx.fillRect(50,50,200,200);
+	
+}
 
 function draw() {
-	var canvas = document.getElementById("canvas");
+	
+	var canvas = activeCanvas;
 	var ctx = canvas.getContext("2d");
 	
 	// set fillStyle to white and fill canvas background
@@ -93,7 +119,7 @@ function draw() {
 				strokeColor = "rgb(0,0,0)";
 			else
 				strokeColor = "rgb(200,200,200)";
-			DrawWall([0, x, y], strokeColor);
+			DrawWall(ctx, [0, x, y], strokeColor);
 		}
 	}
 	
@@ -104,22 +130,21 @@ function draw() {
 				strokeColor = "rgb(0,0,0)";
 			else
 				strokeColor = "rgb(200,200,200)";
-			DrawWall([1, x, y], strokeColor);
+			DrawWall(ctx, [1, x, y], strokeColor);
 		}
 	}
 	
-	canvas.addEventListener("click", ClickToToggleWall, false);
-	canvas.addEventListener("mousemove", updateHoverCoordinates, false);
-	//canvas.addEventListener("mousemove", HighlightNearestWall, false);
+	activeCanvas.addEventListener("click", ClickToToggleWall, false);
+	activeCanvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
 	
 	print('horizontalwall', '0:[' + Walls[0][0] + ']1:[' + Walls[0][1] + ']2:[' + Walls[0][2] + ']');
 	print('verticalwall', '0:[' + Walls[1][0] + ']1:[' + Walls[1][1] + ']2:[' + Walls[1][2] + ']');
 
 }
 
-function DrawWall(wall, color) {
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
+function DrawWall(ctx, wall, color) {
+	//var canvas = document.getElementById("canvas");
+	//var ctx = canvas.getContext("2d");
 	
 	if (wall == [])
 		return;
@@ -197,30 +222,18 @@ function RotateWallsArrayRight() {
 \*******************/
 
 
-function InsertCat() {
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
-
-	var img = new Image();
-	img.src = "crazycat.png";
-	
-	ctx.drawImage(img,0,0);
-	
-}
-
-
 function RotateLeft() {
 // called by "Rotate Left" button
 
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
+	var ctx = GetContextFromActiveCanvas();
 	ctx.save();
 	
 	var img = new Image();
-	img.src = canvas.toDataURL("image/png");
+	img.src = activeCanvas.toDataURL("image/png");
 	
 	AnimatedRotateLeft(ctx, img);
 	
+	setTimeout(function(){RotateWallsArrayLeft();},500);
 }
 
 function AnimatedRotateLeft(ctx, img) {
@@ -236,42 +249,22 @@ function AnimatedRotateLeft(ctx, img) {
 
 	// re-drawing walls as the final "move"
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
-	setTimeout("RotateWallsArrayLeft()",500);
-
-}
-
-function singleRotate(ctx, img, angle) {
-
-	//clear background to white first
-	ctx.fillStyle = "rgb(255,255,255)";
 	
-	// additional pixel buffer to eliminate artifact lines
-	ctx.fillRect(-1, -1, canvas.width+2, canvas.height+2);
-	
-	ctx.translate(150,150);
-	ctx.rotate(angle * Math.PI/180);
-	ctx.translate(-150,-150);
-	ctx.drawImage(img,0,0);
 
-}
-
-function RestoreCanvasContext(ctx) {
-// necessary for restoring saved canvas context states within a setTimeout() call
-	ctx.restore();
 }
 
 function RotateRight() {
 // called by "Rotate Right" button
 
-	
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
+	var ctx = GetContextFromActiveCanvas();
 	ctx.save();
 	
 	var img = new Image();
-	img.src = canvas.toDataURL("image/png");
+	img.src = activeCanvas.toDataURL("image/png");
 	
 	AnimatedRotateRight(ctx, img);
+	setTimeout(function(){RotateWallsArrayRight();},500);
+
 
 }
 
@@ -288,31 +281,36 @@ function AnimatedRotateRight(ctx, img) {
 
 	// re-drawing walls as the final "move"
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
-	setTimeout("RotateWallsArrayRight()",500);
 
+}
+
+function singleRotate(ctx, img, angle) {
+
+	//clear background to white first
+	ctx.fillStyle = "rgb(255,255,255)";
+	
+	// additional pixel buffer to eliminate artifact lines
+	ctx.fillRect(-1, -1, activeCanvas.width+2, activeCanvas.height+2);
+	
+	ctx.translate(150,150);
+	ctx.rotate(angle * Math.PI/180);
+	ctx.translate(-150,-150);
+	ctx.drawImage(img,0,0);
+
+}
+
+function RestoreCanvasContext(ctx) {
+// necessary for restoring saved canvas context states within a setTimeout() call
+	ctx.restore();
 }
 
 
 
 
 
-
-function HighlightNearestWall(e) {
-	var x = e.clientX - 8;
-	var y = e.clientY - 8;
-	
-	var wall = GetWallFromCoordinates(x, y);
-	
-	draw();
-	
-	if (wall != null) {
-		DrawWall(wall, "rgb(255,255,0)");
-	}
-	
-	print('output', x + ', ' + y);
-
-}
-
+/******************\
+** Event Handlers **
+\******************/
 
 function ClickToToggleWall(e) {
 	var x = e.clientX - 8;
@@ -330,6 +328,14 @@ function ClickToToggleWall(e) {
 	print('output', x + ', ' + y);
 }
 
+function updateHoverCoordinates_debug(e) {
+	var x = e.clientX - 8;
+	var y = e.clientY - 8;
+
+	print('hoverY', y);
+	print('hoverX', x);
+}
+
 
 function GetWallFromCoordinates(x, y) {
 	var quadX;
@@ -337,13 +343,17 @@ function GetWallFromCoordinates(x, y) {
 	
 	if ((x > 325) || (y > 325)) {
 		return null;
-	} else if ((x % 100 > 25) && (x % 100 < 75)) {		//test for proximity to horizontal wall
+	} else if ((x % 100 > 25) && (x % 100 < 75)) {		
+		
+		//test for proximity to horizontal wall
 		if ((y % 100 < 25) || (y % 100 > 75)) {
 			quadX = Math.round((x-26)/100);
 			quadY = Math.round(y/100);
 			return [0, quadX, quadY];
 		}
-	} else if ((x % 100 < 25) || (x % 100 > 75)) {		//test for proximity to vertical wall
+	} else if ((x % 100 < 25) || (x % 100 > 75)) {		
+	
+		//test for proximity to vertical wall
 		if ((y % 100 > 25) && (y % 100 < 75)) {
 			quadX = Math.round(x/100);
 			quadY = Math.round((y-26)/100);
@@ -355,21 +365,33 @@ function GetWallFromCoordinates(x, y) {
 }
 
 
-function updateHoverCoordinates(e) {
-	var x = e.clientX - 8;
-	var y = e.clientY - 8;
 
-	print('hoverY', y);
-	print('hoverX', x);
-}
 
 function print(id, text) {
 	
 	document.getElementById(id).innerHTML = text;
 }
 
+// http://stackoverflow.com/questions/2544260/how-to-save-html5-canvas
+function saveCanvas() {
+	var canvas = document.getElementById("canvas");
+	var context = canvas.getContext("2d");
+	var strDataURI = canvas.toDataURL("image/png;base64");
+	window.open(strDataURI);
+}  
 
 
+
+function InsertCat() {
+	var canvas = document.getElementById("canvas00");
+	var ctx = canvas.getContext("2d");
+
+	var img = new Image();
+	img.src = "crazycat.png";
+	
+	ctx.drawImage(img,0,0);
+	
+}
 
 
 
