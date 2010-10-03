@@ -1,5 +1,3 @@
-
-
 function Create2DArray(columns, rows, value) {
   var arr = [];
 
@@ -14,13 +12,12 @@ function Create2DArray(columns, rows, value) {
 }
 
 
-// initialize wall arrays
 var HorizontalWall = Create2DArray(3, 4, false);
 var VerticalWall = Create2DArray(3, 4, false);
 var coordX = 0;
 var coordY = 0;
 
-// setup initial wall positions
+
 HorizontalWall[0][0] = true;
 HorizontalWall[0][1] = true;
 HorizontalWall[0][2] = true;
@@ -51,28 +48,42 @@ var Walls = [];
 Walls[0] = HorizontalWall;
 Walls[1] = VerticalWall;
 
+	
+function IsSurroundedByWalls(x, y) {
+	var topAndBottom = Walls[0][x][y] && Walls[0][x][y+1];
+	var sides = Walls[1][y][x] && Walls[1][y][x+1];
+	return sides && topAndBottom;
+}
 
 
-/**********************************\
-** Draw Current Walls and Squares **
-\**********************************/
+function CalculateEnclosure() {
+	var result = Create2DArray(3, 3, false);
+	
+	//var active = Create2DArray(3, 3, cellStatusType.unknown);
+	
+	for (var x=0; x<result.length; x++) {
+		for (var y=0; y<result[0].length; y++) {
+			result[x][y] = IsSurroundedByWalls(x, y);
+		}	
+	}
+	
+	return result;
+}
+
+
 
 
 function draw() {
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 	
-	// set fillStyle to white and fill canvas background
 	ctx.fillStyle = "rgb(255,255,255)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
  
-	// no idea why this is here...??
 	ctx.fillStyle = "rgb(10,200,20)";
 	
-	// generate 3x3 array describing whether tiles are enclosed (t) or not (f)
-	var FilledIn = CalculateSquaresArray();
+	var FilledIn = CalculateEnclosure();
 	
-	// use FilledIn to draw each tile with correct color
 	for (var x=0; x<FilledIn.length; x++) {
 		for (var y=0; y<FilledIn.length; y++) {
 			if (FilledIn[x][y])
@@ -83,10 +94,8 @@ function draw() {
 		}
 	}
 
-	// set default wall color (med grey)
 	var strokeColor = "rgb(200,200,200)";
 	
-	// use Walls (HorizontalWall) to draw horizontal wall positions
 	for (var x=0;x<Walls[0].length;x++) {
 		for (var y=0;y<Walls[0][0].length;y++) {
 			if (Walls[0][x][y])
@@ -97,7 +106,6 @@ function draw() {
 		}
 	}
 	
-	// use Walls (VerticalWall) to draw vertical wall positions
 	for (var x=0;x<Walls[1].length;x++) {
 		for (var y=0;y<Walls[1][0].length;y++) {
 			if (Walls[1][x][y])
@@ -117,6 +125,101 @@ function draw() {
 
 }
 
+function InsertCat() {
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	ctx.save();
+	
+	//clear background to white
+	//ctx.fillStyle = "rgb(255,255,255)";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	var img = new Image();
+	img.src = "crazycat.png";
+	ctx.translate(150,150);
+	
+	AnimatedRotateLeft(ctx, img, 90);
+
+	
+	//RotateWallsArrayLeft();
+	ctx.restore();
+	ctx.scale(.97,.97);
+	//draw();
+	
+}
+
+function RotateLeft() {
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	ctx.save();
+	
+	//clear background to white
+	//ctx.fillStyle = "rgb(255,255,255)";
+	//ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	var img = new Image();
+	img.src = canvas.toDataURL("image/png");
+	ctx.translate(150,150);
+	
+	AnimatedRotateLeft(ctx, img, 90);
+
+	
+	//RotateWallsArrayLeft();
+	ctx.restore();
+	//draw();
+	
+}
+
+function AnimatedRotateLeft(ctx, img, angle) {
+	ctx.drawImage(img,-150,-150);
+	ctx.rotate(20 * Math.PI/180);
+	ctx.drawImage(img,-150,-150);
+	ctx.rotate(40 * Math.PI/180);
+	ctx.drawImage(img,-150,-150);
+	ctx.rotate(60 * Math.PI/180);
+	/*
+	for (var a = 10; a<angle; a+=10) {
+		ctx.rotate(a * Math.PI/180);
+		ctx.drawImage(img,-150,-150);
+	}
+	*/
+		
+}
+
+function RotateRight() {
+	RotateWallsArrayRight();
+}
+
+function RotateWallsArrayLeft() {
+	print('output', 'Rotating Left!');
+	
+	var oWalls = Walls;
+	var newWalls = [oWalls[1], oWalls[0]];
+	
+	newWalls[1].reverse();
+	for (var x=0;x<newWalls[0].length;x++) {
+		newWalls[0][x].reverse();
+	}
+	
+	Walls = newWalls;
+	draw();
+}
+
+function RotateWallsArrayRight() {
+	print('output', 'Rotating Right!');
+	
+	var oWalls = Walls;
+	var newWalls = [oWalls[1], oWalls[0]];
+	
+	newWalls[0].reverse();
+	for (var x=0;x<newWalls[1].length;x++) {
+		newWalls[1][x].reverse();
+	}
+	
+	Walls = newWalls;
+	draw();
+}
+
 function DrawWall(wall, color) {
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
@@ -132,142 +235,6 @@ function DrawWall(wall, color) {
 		ctx.strokeRect(wall[2]*100, wall[1]*100, 2, 100);
 	}
 }
-
-
-function CalculateSquaresArray() {
-// generate 3x3 array describing whether tiles are enclosed (t) or not (f)
-
-	var result = Create2DArray(3, 3, false);
-	
-	for (var x=0; x<result.length; x++) {
-		for (var y=0; y<result[0].length; y++) {
-			result[x][y] = IsSurroundedByWalls(x, y);
-		}	
-	}	
-	return result;
-}
-
-
-function IsSurroundedByWalls(x, y) {
-// determine whether a square is surrounded on all four sides by walls
-
-	var topAndBottom = Walls[0][x][y] && Walls[0][x][y+1];
-	var sides = Walls[1][y][x] && Walls[1][y][x+1];
-	return sides && topAndBottom;
-}
-
-
-function RotateWallsArrayLeft() {
-// rotate the entire array of walls counter-clockwise, and draw to canvas
-
-	print('output', 'Rotating Walls Array counter-clockwise!');
-	
-	var oWalls = Walls;
-	var newWalls = [oWalls[1], oWalls[0]];
-	
-	newWalls[1].reverse();
-	for (var x=0;x<newWalls[0].length;x++) {
-		newWalls[0][x].reverse();
-	}
-	
-	Walls = newWalls;
-	draw();
-}
-
-function RotateWallsArrayRight() {
-// rotate the entire array of walls clockwise, and draw to canvas
-
-	print('output', 'Rotating Walls Array clockwise!');
-	
-	var oWalls = Walls;
-	var newWalls = [oWalls[1], oWalls[0]];
-	
-	newWalls[0].reverse();
-	for (var x=0;x<newWalls[1].length;x++) {
-		newWalls[1][x].reverse();
-	}
-	
-	Walls = newWalls;
-	draw();
-}
-
-
-/*******************\
-** Image Animation **
-\*******************/
-
-
-function InsertCat() {
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
-	
-	//clear background to white
-	//ctx.fillStyle = "rgb(255,255,255)";
-	//ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-	var img = new Image();
-	img.src = "crazycat.png";
-	
-	AnimatedRotateLeft(ctx, img);
-	//ctx.scale(.97,.97);
-	//draw();	
-}
-
-
-function RotateLeft() {
-	var canvas = document.getElementById("canvas");
-	var ctx = canvas.getContext("2d");
-	ctx.save();
-	
-	var img = new Image();
-	img.src = canvas.toDataURL("image/png");
-	
-	AnimatedRotateLeft(ctx, img);
-	
-}
-
-function AnimatedRotateLeft(ctx, img) {
-
-	
-	singleRotate(ctx, img,-15);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 100);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 200);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 300);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 400);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 500);
-	//setTimeout(function(){singleRotate(ctx,img);}, 600);
-
-	setTimeout(function(){RestoreCanvasContext(ctx);},700);
-	setTimeout("RotateWallsArrayLeft()",800);
-
-}
-
-function singleRotate(ctx, img, angle) {
-	//clear background to white first
-	ctx.fillStyle = "rgb(255,255,255)";
-	ctx.fillRect(-1, -1, canvas.width+2, canvas.height+2);
-	ctx.translate(150,150);
-	ctx.rotate(angle * Math.PI/180);
-	ctx.translate(-150,-150);
-	ctx.drawImage(img,0,0);
-
-}
-
-function RestoreCanvasContext(ctx) {
-// necessary for restoring saved states within setTimeout()
-	ctx.restore();
-}
-
-function RotateRight() {
-	RotateWallsArrayRight();
-}
-
-
-
-
-
-
-
 
 function HighlightNearestWall(e) {
 	var x = e.clientX - 8;
