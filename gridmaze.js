@@ -200,21 +200,18 @@ function RotateWallsArrayRight() {
 function InsertCat() {
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
-	
-	//clear background to white
-	//ctx.fillStyle = "rgb(255,255,255)";
-	//ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 	var img = new Image();
 	img.src = "crazycat.png";
 	
-	AnimatedRotateLeft(ctx, img);
-	//ctx.scale(.97,.97);
-	//draw();	
+	ctx.drawImage(img,0,0);
+	
 }
 
 
 function RotateLeft() {
+// called by "Rotate Left" button
+
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 	ctx.save();
@@ -227,25 +224,30 @@ function RotateLeft() {
 }
 
 function AnimatedRotateLeft(ctx, img) {
-
 	
-	singleRotate(ctx, img,-15);
+	print('output', 'Animating counter-clockwise rotation!');
+
+	// animated rotation for 75 degrees
+	singleRotate(ctx, img, -15);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 100);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 200);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 300);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 400);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 500);
-	//setTimeout(function(){singleRotate(ctx,img);}, 600);
 
-	setTimeout(function(){RestoreCanvasContext(ctx);},700);
-	setTimeout("RotateWallsArrayLeft()",800);
+	// re-drawing walls as the final "move"
+	setTimeout(function(){RestoreCanvasContext(ctx);},450);
+	setTimeout("RotateWallsArrayLeft()",500);
 
 }
 
 function singleRotate(ctx, img, angle) {
+
 	//clear background to white first
 	ctx.fillStyle = "rgb(255,255,255)";
+	
+	// additional pixel buffer to eliminate artifact lines
 	ctx.fillRect(-1, -1, canvas.width+2, canvas.height+2);
+	
 	ctx.translate(150,150);
 	ctx.rotate(angle * Math.PI/180);
 	ctx.translate(-150,-150);
@@ -254,15 +256,41 @@ function singleRotate(ctx, img, angle) {
 }
 
 function RestoreCanvasContext(ctx) {
-// necessary for restoring saved states within setTimeout()
+// necessary for restoring saved canvas context states within a setTimeout() call
 	ctx.restore();
 }
 
 function RotateRight() {
-	RotateWallsArrayRight();
+// called by "Rotate Right" button
+
+	
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	ctx.save();
+	
+	var img = new Image();
+	img.src = canvas.toDataURL("image/png");
+	
+	AnimatedRotateRight(ctx, img);
+
 }
 
+function AnimatedRotateRight(ctx, img) {
 
+	print('output', 'Animating clockwise rotation!');
+
+	// animated rotation for 75 degrees
+	singleRotate(ctx, img, 15);
+	setTimeout(function(){singleRotate(ctx,img,15);}, 100);
+	setTimeout(function(){singleRotate(ctx,img,15);}, 200);
+	setTimeout(function(){singleRotate(ctx,img,15);}, 300);
+	setTimeout(function(){singleRotate(ctx,img,15);}, 400);
+
+	// re-drawing walls as the final "move"
+	setTimeout(function(){RestoreCanvasContext(ctx);},450);
+	setTimeout("RotateWallsArrayRight()",500);
+
+}
 
 
 
