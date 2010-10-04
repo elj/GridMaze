@@ -1,0 +1,40 @@
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <script src="gridmaze-tiles.js" type="text/javascript"></script>
+    </head>
+    <body onload="setMultigridEnvironment()">
+    	
+        <canvas id="canvas00" width="302" height="302"></canvas>
+        <canvas id="canvas10" width="302" height="302"></canvas>
+        <br />
+        <button onClick="RotateLeft()">Rotate Left</button>
+        <button onClick="RotateRight()">Rotate Right</button>
+        <button onClick="InsertCat()">Cat</button>
+        <button onClick="saveCanvas()">Generate .png</button>
+        <br/><br />
+        <h1>Multigrid</h1>
+        <div id="debug" style="background-color:#FFFFAF">
+        <p>Hover: <b id="hoverX">x</b><b>,</b> <b id="hoverY">y</b></p>
+        <p>Last Click: <b id="clickX">x</b><b>,</b> <b id="clickY">y</b></p>
+        <font color="red"><p id="output"> </p><p id="output2"</p></font>
+        <p>HorizontalWall:</p>
+        <p id="horizontalwall"></p>
+        <p>VerticalWall:</p>
+        <p id="verticalwall"></p>
+        </div>
+        
+		
+		<h2>To do:</h2>
+			<ul>
+				<li>Fix canvases with new activeTile code</li>
+				<li>Randomize initial wall settings</li>
+				<li>Create meta-grid of tiles</li>
+				<li>Allow selection of active tile</li>
+				<li>Rotate individual tiles</li>
+				
+			</ul>
+        
+    </body>
+    
+</html>
