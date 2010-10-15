@@ -4,10 +4,11 @@
 \**************************/
 
 /*
+// setup static initial wall positions
+
 var HorizontalWall0 = Create2DArray(3, 4, false);
 var VerticalWall1 = Create2DArray(3, 4, false);
 
-// setup static initial wall positions
 HorizontalWall0[0][0] = true;
 HorizontalWall0[0][1] = true;
 HorizontalWall0[0][2] = true;
@@ -33,8 +34,6 @@ VerticalWall1[2][0] = true;
 VerticalWall1[2][1] = true;
 VerticalWall1[2][2] = true;
 VerticalWall1[2][3] = true;
-
-
 
 var Walls = [];
 Walls[0] = HorizontalWall0;
@@ -248,8 +247,10 @@ function draw() {
 		}
 	}
 	
-	if (gridIsEditable==1)
+	if (gridIsEditable==1) {
+	// allow toggling of walls
 		canvas.addEventListener("click", ClickToToggleWall, false);
+	}
 	
 	canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
 	
@@ -510,10 +511,7 @@ function GetWallFromCoordinates(x, y) {
 		}
 	}
 	return null;
-	
 }
-
-
 
 
 function print(id, text) {
@@ -521,13 +519,6 @@ function print(id, text) {
 	document.getElementById(id).innerHTML = text;
 }
 
-// http://stackoverflow.com/questions/2544260/how-to-save-html5-canvas
-function saveCanvas() {
-	var canvas = Tiles[activeTileID].getCanvas();
-	var context = canvas.getContext("2d");
-	var strDataURI = canvas.toDataURL("image/png;base64");
-	window.open(strDataURI);
-}  
 
 
 /*****************\
