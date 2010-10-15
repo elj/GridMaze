@@ -3,43 +3,44 @@
 ** Initialize Wall Arrays **
 \**************************/
 
-/*
-var HorizontalWall = Create2DArray(3, 4, false);
-var VerticalWall = Create2DArray(3, 4, false);
+
+var HorizontalWall0 = Create2DArray(3, 4, false);
+var VerticalWall1 = Create2DArray(3, 4, false);
 
 // setup static initial wall positions
-HorizontalWall[0][0] = true;
-HorizontalWall[0][1] = true;
-HorizontalWall[0][2] = true;
-HorizontalWall[0][3] = true;
+HorizontalWall0[0][0] = true;
+HorizontalWall0[0][1] = true;
+HorizontalWall0[0][2] = true;
+HorizontalWall0[0][3] = true;
 
-HorizontalWall[1][2] = true;
-HorizontalWall[1][3] = true;
+HorizontalWall0[1][2] = true;
+HorizontalWall0[1][3] = true;
 
-HorizontalWall[2][0] = true;
-HorizontalWall[2][1] = true;
-HorizontalWall[2][2] = true;
-HorizontalWall[2][3] = true;
+HorizontalWall0[2][0] = true;
+HorizontalWall0[2][1] = true;
+HorizontalWall0[2][2] = true;
+HorizontalWall0[2][3] = true;
 
-VerticalWall[0][0] = true;
-VerticalWall[0][1] = true;
-VerticalWall[0][2] = true;
-VerticalWall[0][3] = true;
+VerticalWall1[0][0] = true;
+VerticalWall1[0][1] = true;
+VerticalWall1[0][2] = true;
+VerticalWall1[0][3] = true;
 
-VerticalWall[1][2] = true;
-VerticalWall[1][3] = true;
+VerticalWall1[1][2] = true;
+VerticalWall1[1][3] = true;
 
-VerticalWall[2][0] = true;
-VerticalWall[2][1] = true;
-VerticalWall[2][2] = true;
-VerticalWall[2][3] = true;
-*/
+VerticalWall1[2][0] = true;
+VerticalWall1[2][1] = true;
+VerticalWall1[2][2] = true;
+VerticalWall1[2][3] = true;
+
+
+
+var Walls = [];
+Walls[0] = HorizontalWall0;
+Walls[1] = VerticalWall1;
 
 /*
-var InitialWalls = [];
-Walls[0] = HorizontalWall;
-Walls[1] = VerticalWall;
-
 var RandomHorizontalWall = CreateRandomized2DArray(3, 4);
 var RandomVerticalWall = CreateRandomized2DArray(3, 4);
 
@@ -85,7 +86,13 @@ function Tile(canvas, walls) {
 	this.canvas = canvas;
 	this.walls = walls;
 	this.updateWalls = function(wallsArray) {
+		print('newhwall', '0:[' + wallsArray[0][0] + ']1:[' + wallsArray[0][1] + ']2:[' + wallsArray[0][2] + ']');
+		print('newvwall', '0:[' + wallsArray[1][0] + ']1:[' + wallsArray[1][1] + ']2:[' + wallsArray[1][2] + ']');
+		
 		this.walls = wallsArray
+		
+		print('newTileHwall', '0:[' + this.walls[0][0] + ']1:[' + this.walls[0][1] + ']2:[' + this.walls[0][2] + ']');
+		print('newTileVwall', '0:[' + this.walls[1][0] + ']1:[' + this.walls[1][1] + ']2:[' + this.walls[1][2] + ']');
 	}
 	this.getCanvas = function() {
 		return canvas;
@@ -93,6 +100,19 @@ function Tile(canvas, walls) {
 	this.getWalls = function() {
 		return walls;
 	}
+	this.getHorizontalWalls = function() {
+		return walls[0];
+	}
+	this.getVerticalWalls = function() {
+		return walls[1];
+	}
+	this.setHorizontalWalls = function(wallsArrayH) {
+		this.walls[0] = wallsArrayH;
+	}
+	this.setVerticalWalls = function(wallsArrayV) {
+		this.walls[1] = wallsArrayV;
+	}
+	
 	this.toString = function() {
 		return "I exist";
 	}
@@ -106,9 +126,10 @@ function CreateTileArray() {
 	canvases = document.getElementsByTagName("canvas");
 	print('output2', "canvases length is " + canvases.length);
 	for (var c=0;c<canvases.length-1;c++) {
-  		var walls = [];
-  		walls[0] = CreateRandomized2DArray(3, 4);
-  		walls[1] = CreateRandomized2DArray(3, 4);
+	
+  		var walls = Walls; //var walls = [];
+  		//walls[0] = CreateRandomized2DArray(3, 4);
+  		//walls[1] = CreateRandomized2DArray(3, 4);
 		arr[c] = new Tile(canvases[c],walls);
 	}
 	
@@ -176,7 +197,7 @@ function draw() {
 	var canvas;
 	
 	if(Tiles[activeTileID].getCanvas()) {
-		print('output', "Using active tile");
+		print('output', "Active Tile = " + activeTileID);
 		canvas = Tiles[activeTileID].getCanvas();
 	} else {
 		print('output', "No canvas!");
@@ -276,46 +297,62 @@ function CalculateSquaresArray() {
 
 function IsSurroundedByWalls(x, y) {
 // determine whether a square is surrounded on all four sides by walls
-	var Walls = Tiles[activeTileID].getWalls();
+	var hWalls = Tiles[activeTileID].getHorizontalWalls();
+	var vWalls = Tiles[activeTileID].getVerticalWalls();
 	
-	var topAndBottom = Walls[0][x][y] && Walls[0][x][y+1];
-	var sides = Walls[1][y][x] && Walls[1][y][x+1];
+	var topAndBottom = hWalls[x][y] && hWalls[x][y+1];
+	var sides = vWalls[y][x] && vWalls[y][x+1];
 	return sides && topAndBottom;
 }
 
 
 function RotateWallsArrayLeft() {
 // rotate the entire array of walls counter-clockwise, and draw to canvas
+// Walls[0] = Horizontal, [1] = Vertical
 
 	print('output', 'Rotating Walls Array counter-clockwise!');
 	
 	var oWalls = Tiles[activeTileID].getWalls();
 	var newWalls = [oWalls[1], oWalls[0]];
 	
+	print('oldhwall', '0:[' + oWalls[0][0] + ']1:[' + oWalls[0][1] + ']2:[' + oWalls[0][2] + ']');
+	print('oldvwall', '0:[' + oWalls[1][0] + ']1:[' + oWalls[1][1] + ']2:[' + oWalls[1][2] + ']');
+	
 	newWalls[1].reverse();
+	
 	for (var x=0;x<newWalls[0].length;x++) {
 		newWalls[0][x].reverse();
 	}
 
-	Tiles[activeTileID].updateWalls(newWalls);
+	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
+	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
 	
 	draw();
 }
 
 function RotateWallsArrayRight() {
 // rotate the entire array of walls clockwise, and draw to canvas
+// Walls[0] = Horizontal, [1] = Vertical
 
 	print('output', 'Rotating Walls Array clockwise!');
 	
-	var oWalls = Tiles[activeTileID].getWalls();
-	var newWalls = [oWalls[1], oWalls[0]];
+	var oWalls = [];
+	oWalls = Tiles[activeTileID].getWalls();
+	var newWalls = [];
+	newWalls = [oWalls[1], oWalls[0]];
+	
+	print('oldhwall', '0:[' + oWalls[0][0] + ']1:[' + oWalls[0][1] + ']2:[' + oWalls[0][2] + ']');
+	print('oldvwall', '0:[' + oWalls[1][0] + ']1:[' + oWalls[1][1] + ']2:[' + oWalls[1][2] + ']');
 	
 	newWalls[0].reverse();
+	
 	for (var x=0;x<newWalls[1].length;x++) {
 		newWalls[1][x].reverse();
 	}
 	
-	Tiles[activeTileID].updateWalls(newWalls);
+	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
+	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
+	
 	draw();
 }
 
@@ -339,6 +376,21 @@ function RotateLeft() {
 	setTimeout(function(){RotateWallsArrayLeft();},500);
 }
 
+function RotateRight() {
+// called by "Rotate Right" button
+
+	var ctx = Tiles[activeTileID].getCanvas().getContext("2d");
+	ctx.save();
+	
+	var img = new Image();
+	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
+	
+	AnimatedRotateRight(ctx, img);
+
+	setTimeout(function(){RotateWallsArrayRight();},500);
+}
+
+
 function AnimatedRotateLeft(ctx, img) {
 	
 	print('output', 'Animating counter-clockwise rotation!');
@@ -356,20 +408,6 @@ function AnimatedRotateLeft(ctx, img) {
 
 }
 
-function RotateRight() {
-// called by "Rotate Right" button
-
-	var ctx = Tiles[activeTileID].getCanvas().getContext("2d");
-	ctx.save();
-	
-	var img = new Image();
-	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
-	
-	AnimatedRotateRight(ctx, img);
-	setTimeout(function(){RotateWallsArrayRight();},500);
-
-
-}
 
 function AnimatedRotateRight(ctx, img) {
 
