@@ -141,6 +141,22 @@ var activeTileID = 0;
 
 var gridIsEditable = 0;
 
+function getActiveContext() {
+	var canvas;
+	
+	if(Tiles[activeTileID].getCanvas()) {
+		print('output', "Active Tile = " + activeTileID);
+		canvas = Tiles[activeTileID].getCanvas();
+	} else {
+		print('output', "No canvas!");
+		canvas = document.getElementById("canvas00");
+
+	}
+	var ctx = canvas.getContext("2d");
+	
+	return ctx;
+}
+
 function setEditTilesEnvironment() {
 // called onload - needs to eventually set parameters to make walls editable
 	
@@ -187,17 +203,8 @@ function draw() {
 	
 	//print('output', "Tiles is " + Tiles);
 	//print('output2', "grid is "+gridIsEditable);
-	var canvas;
 	
-	if(Tiles[activeTileID].getCanvas()) {
-		print('output', "Active Tile = " + activeTileID);
-		canvas = Tiles[activeTileID].getCanvas();
-	} else {
-		print('output', "No canvas!");
-		canvas = document.getElementById("canvas00");
-
-	}
-	var ctx = canvas.getContext("2d");
+	var ctx = getActiveContext();
 	
 	// set fillStyle to white and fill canvas background
 	ctx.fillStyle = "rgb(255,255,255)";
@@ -519,7 +526,17 @@ function print(id, text) {
 	document.getElementById(id).innerHTML = text;
 }
 
+/********************\
+** Canvas Selection **
+\********************/
 
+function showActiveCanvas() {
+	
+}
+
+function DisplayOriginImage() {
+	
+}
 
 /*****************\
 ** Cat Functions **
@@ -541,8 +558,7 @@ function ToggleCatMode() {
 
 
 function InsertCat() {
-	var canvas = Tiles[activeTileID].getCanvas();
-	var ctx = canvas.getContext("2d");
+	var ctx = getActiveContext();
 
 	var img = new Image();
 	img.src = "crazycat.png";
