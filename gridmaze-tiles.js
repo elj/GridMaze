@@ -3,7 +3,7 @@
 ** Initialize Wall Arrays **
 \**************************/
 
-
+/*
 var HorizontalWall0 = Create2DArray(3, 4, false);
 var VerticalWall1 = Create2DArray(3, 4, false);
 
@@ -39,14 +39,8 @@ VerticalWall1[2][3] = true;
 var Walls = [];
 Walls[0] = HorizontalWall0;
 Walls[1] = VerticalWall1;
-
-/*
-var RandomHorizontalWall = CreateRandomized2DArray(3, 4);
-var RandomVerticalWall = CreateRandomized2DArray(3, 4);
-
-InitialWalls[0] = RandomHorizontalWall;
-InitialWalls[1] = RandomVerticalWall;
 */
+
 
 function Create2DArray(columns, rows, value) {
   var arr = [];
@@ -127,9 +121,9 @@ function CreateTileArray() {
 	print('output2', "canvases length is " + canvases.length);
 	for (var c=0;c<canvases.length-1;c++) {
 	
-  		var walls = Walls; //var walls = [];
-  		//walls[0] = CreateRandomized2DArray(3, 4);
-  		//walls[1] = CreateRandomized2DArray(3, 4);
+  		var walls = [];
+  		walls[0] = CreateRandomized2DArray(3, 4);
+  		walls[1] = CreateRandomized2DArray(3, 4);
 		arr[c] = new Tile(canvases[c],walls);
 	}
 	
@@ -373,7 +367,8 @@ function RotateLeft() {
 	
 	AnimatedRotateLeft(ctx, img);
 	
-	setTimeout(function(){RotateWallsArrayLeft();},500);
+	if(CatMode != 1)
+		setTimeout(function(){RotateWallsArrayLeft();},500);
 }
 
 function RotateRight() {
@@ -387,7 +382,8 @@ function RotateRight() {
 	
 	AnimatedRotateRight(ctx, img);
 
-	setTimeout(function(){RotateWallsArrayRight();},500);
+	if(CatMode != 1)
+		setTimeout(function(){RotateWallsArrayRight();},500);
 }
 
 
@@ -401,9 +397,13 @@ function AnimatedRotateLeft(ctx, img) {
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 200);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 300);
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 400);
+	// re-drawing walls is the final "move", no more rotating here
+	
+	if(CatMode == 1)
+		setTimeout(function(){singleRotate(ctx,img,-15);},425);
 
-	// re-drawing walls as the final "move"
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
+		
 	
 
 }
@@ -419,8 +419,11 @@ function AnimatedRotateRight(ctx, img) {
 	setTimeout(function(){singleRotate(ctx,img,15);}, 200);
 	setTimeout(function(){singleRotate(ctx,img,15);}, 300);
 	setTimeout(function(){singleRotate(ctx,img,15);}, 400);
-
-	// re-drawing walls as the final "move"
+	// re-drawing walls is the final "move", no more rotating here
+	
+	if(CatMode == 1)
+		setTimeout(function(){singleRotate(ctx,img,15);},425);
+		
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
 
 }
@@ -526,6 +529,24 @@ function saveCanvas() {
 	window.open(strDataURI);
 }  
 
+
+/*****************\
+** Cat Functions **
+\*****************/
+
+var CatMode = 0;
+
+function ToggleCatMode() {
+// called by "Cat" button
+
+	CatMode = !CatMode;
+	
+	if(CatMode == 1)
+		InsertCat();
+	else
+		draw();
+		
+}
 
 
 function InsertCat() {
