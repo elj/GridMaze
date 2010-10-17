@@ -118,7 +118,7 @@ function CreateTileArray() {
 	var canvases = [];
 	canvases = document.getElementsByTagName("canvas");
 	print('output2', "canvases length is " + canvases.length);
-	for (var c=0;c<canvases.length-1;c++) {
+	for (var c=0;c<canvases.length;c++) {
 	
   		var walls = [];
   		walls[0] = CreateRandomized2DArray(3, 4);
@@ -141,6 +141,43 @@ var activeTileID = 0;
 
 var gridIsEditable = 0;
 
+
+function setEditTilesEnvironment() {
+// called onload - single Tile canvas, make walls editable
+	
+	Tiles = CreateTileArray();
+	
+	activeTileID = 0;
+
+	canvas.addEventListener("click", ClickToToggleWall, false);
+	canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
+	
+	var canvas2 = document.getElementById("canvas10");
+	drawAnotherCanvas(canvas2);
+	
+	drawActiveCanvas();
+}
+
+function setMultigridEnvironment() {
+// called onload - multiple Tile canvases
+	
+	Tiles = CreateTileArray();
+	
+	if(Tiles)
+		activeTileID = 0;
+	
+	for(var t=0; t<Tiles.length; t++) {
+	// add event listeners and draw each canvas
+		activeTileID = t;
+		var canvas = Tiles[t].getCanvas();
+		canvas.addEventListener("click", ReturnClickedCanvas, false);
+		canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
+	
+		drawActiveCanvas();
+	}
+	
+}
+
 function getActiveContext() {
 	var canvas;
 	
@@ -157,34 +194,17 @@ function getActiveContext() {
 	return ctx;
 }
 
-function setEditTilesEnvironment() {
-// called onload - needs to eventually set parameters to make walls editable
+function getActiveCanvas() {
+	var canvas;
 	
-	gridIsEditable = 1;
-	Tiles = CreateTileArray();
-	
-	activeTileID = 0;
-	
-	draw();
-	
-	var canvas2 = document.getElementById("canvas10");
-	drawAnotherCanvas(canvas2);
+	if(Tiles[activeTileID].getCanvas()) {
+		print('output', "Active Tile = " + activeTileID);
+		return Tiles[activeTileID].getCanvas();
+	} else {
+		print('output', "No canvas!");
+		return document.getElementById("canvas00");
+	}
 }
-
-function setMultigridEnvironment() {
-// called onload - needs to eventually set parameters to make walls uneditable
-	
-	Tiles = CreateTileArray();
-	
-	activeTileID = 0;
-	
-	draw();
-	
-	var canvas2 = document.getElementById("canvas10");
-	drawAnotherCanvas(canvas2);
-}
-
-
 
 
 /**********************************\
@@ -199,12 +219,10 @@ function drawAnotherCanvas(canvas) {
 	
 }
 
-function draw() {
+function drawActiveCanvas() {
 	
-	//print('output', "Tiles is " + Tiles);
-	//print('output2', "grid is "+gridIsEditable);
-	
-	var ctx = getActiveContext();
+	var canvas = getActiveCanvas();
+	var ctx = canvas.getContext("2d");
 	
 	// set fillStyle to white and fill canvas background
 	ctx.fillStyle = "rgb(255,255,255)";
@@ -254,12 +272,7 @@ function draw() {
 		}
 	}
 	
-	if (gridIsEditable==1) {
-	// allow toggling of walls
-		canvas.addEventListener("click", ClickToToggleWall, false);
-	}
 	
-	canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
 	
 	print('horizontalwall', '0:[' + Walls[0][0] + ']1:[' + Walls[0][1] + ']2:[' + Walls[0][2] + ']');
 	print('verticalwall', '0:[' + Walls[1][0] + ']1:[' + Walls[1][1] + ']2:[' + Walls[1][2] + ']');
@@ -267,8 +280,6 @@ function draw() {
 }
 
 function DrawWall(ctx, wall, color) {
-	//var canvas = document.getElementById("canvas");
-	//var ctx = canvas.getContext("2d");
 	
 	if (wall == [])
 		return;
@@ -329,7 +340,7 @@ function RotateWallsArrayLeft() {
 	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
 	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
 	
-	draw();
+	drawActiveCanvas();
 }
 
 function RotateWallsArrayRight() {
@@ -355,7 +366,7 @@ function RotateWallsArrayRight() {
 	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
 	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
 	
-	draw();
+	drawActiveCanvas();
 }
 
 
@@ -367,7 +378,7 @@ function RotateWallsArrayRight() {
 function RotateLeft() {
 // called by "Rotate Left" button
 
-	var ctx = Tiles[activeTileID].getCanvas().getContext("2d");
+	var ctx = getActiveContext();
 	ctx.save();
 	
 	var img = new Image();
@@ -382,7 +393,7 @@ function RotateLeft() {
 function RotateRight() {
 // called by "Rotate Right" button
 
-	var ctx = Tiles[activeTileID].getCanvas().getContext("2d");
+	var ctx = getActiveContext();
 	ctx.save();
 	
 	var img = new Image();
@@ -464,6 +475,13 @@ function RestoreCanvasContext(ctx) {
 ** Event Handlers **
 \******************/
 
+function ReturnClickedCanvas(e) {
+	var x = e.clientX - 8;
+	var y = e.clientY - 8;
+	print('clickX', x);
+	print('clickY', y);
+}
+
 function ClickToToggleWall(e) {
 	var x = e.clientX - 8;
 	var y = e.clientY - 8;
@@ -481,7 +499,7 @@ function ClickToToggleWall(e) {
 	}
 	
 	Tiles[activeTileID].updateWalls(newWalls);
-	draw();
+	drawActiveCanvas();
 	print('output', x + ', ' + y);
 }
 
@@ -526,17 +544,6 @@ function print(id, text) {
 	document.getElementById(id).innerHTML = text;
 }
 
-/********************\
-** Canvas Selection **
-\********************/
-
-function showActiveCanvas() {
-	
-}
-
-function DisplayOriginImage() {
-	
-}
 
 /*****************\
 ** Cat Functions **
@@ -552,7 +559,7 @@ function ToggleCatMode() {
 	if(CatMode == 1)
 		InsertCat();
 	else
-		draw();
+		drawActiveCanvas();
 		
 }
 
