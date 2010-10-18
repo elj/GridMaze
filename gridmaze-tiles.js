@@ -75,6 +75,8 @@ function CreateRandomized2DArray(columns, rows) {
 
 var Tiles = [];
 
+var activeTileID = 0;
+
 function Tile(canvas, walls) {
 	this.canvas = canvas;
 	this.walls = walls;
@@ -105,7 +107,6 @@ function Tile(canvas, walls) {
 	this.setVerticalWalls = function(wallsArrayV) {
 		this.walls[1] = wallsArrayV;
 	}
-	
 	this.toString = function() {
 		return "I exist";
 	}
@@ -136,9 +137,6 @@ function CreateTileArray() {
 \*************************/
 
 
-var activeTileID = 0;
-
-
 var gridIsEditable = 0;
 
 
@@ -152,9 +150,6 @@ function setEditTilesEnvironment() {
 	canvas.addEventListener("click", ClickToToggleWall, false);
 	canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
 	
-	var canvas2 = document.getElementById("canvas10");
-	drawAnotherCanvas(canvas2);
-	
 	drawActiveCanvas();
 }
 
@@ -166,17 +161,36 @@ function setMultigridEnvironment() {
 	if(Tiles)
 		activeTileID = 0;
 	
-	for(var t=0; t<Tiles.length; t++) {
-	// add event listeners and draw each canvas
+	for(var t=0; t<Tiles.length; t++) (function(tile){
 		activeTileID = t;
 		var canvas = Tiles[t].getCanvas();
-		canvas.addEventListener("click", ReturnClickedCanvas, false);
+			
+		canvas.addEventListener("mousedown", function(){setClickedTileActive(tile);}, false);
 		canvas.addEventListener("mousemove", updateHoverCoordinates_debug, false);
 	
 		drawActiveCanvas();
-	}
-	
+	}) (t);	
 }
+
+/*
+// from http://trephine.org/t/index.php?title=JavaScript_loop_closures
+
+var list = [ 'a', 'b', 'c' ];
+for (var i=0, l=list.length; i<l; i++) {
+  
+  var f = function(item){
+    alert(item);
+  };
+  
+  f(list[i]);
+}
+
+var list = [ 'a', 'b', 'c' ];
+for (var i=0, l=list.length; i<l; i++) (function(item){
+  setTimeout( function(){ alert(item); }, 1000 );
+})(list[i]);
+
+*/
 
 function getActiveContext() {
 	var canvas;
@@ -211,13 +225,6 @@ function getActiveCanvas() {
 ** Draw Current Walls and Squares **
 \**********************************/
 
-function drawAnotherCanvas(canvas) {
-	var ctx = canvas.getContext("2d");
-	
-	ctx.fillStyle = "rgb(255,255,0)";
-	ctx.fillRect(50,50,200,200);
-	
-}
 
 function drawActiveCanvas() {
 	
@@ -475,11 +482,18 @@ function RestoreCanvasContext(ctx) {
 ** Event Handlers **
 \******************/
 
-function ReturnClickedCanvas(e) {
-	var x = e.clientX - 8;
-	var y = e.clientY - 8;
-	print('clickX', x);
-	print('clickY', y);
+function setClickedTileActive(t) {
+
+	//var oldCanvasID = Tiles[activeTileID].getCanvas().id;
+	//document.getElementById(oldCanvasID).style = "border:0px";
+	
+	activeTileID = t;
+	
+	//var newCanvasID = Tiles[activeTileID].getCanvas().id;
+	//document.getElementById(newCanvasID).style = "border:2px solid red";
+	
+	
+	print('output', "Clicked Tile = " + t);
 }
 
 function ClickToToggleWall(e) {
