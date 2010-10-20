@@ -235,11 +235,9 @@ function drawActiveCanvas() {
 	ctx.fillStyle = "rgb(255,255,255)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
  
-	// no idea why this is here...??
-	ctx.fillStyle = "rgb(10,200,20)";
-	
 	// generate 3x3 array describing whether tiles are enclosed (t) or not (f)
 	var FilledIn = CalculateSquaresArray();
+	var squareSize = Math.round(canvas.width/3)-1;
 	
 	// use FilledIn to draw each tile with correct color
 	for (var x=0; x<FilledIn.length; x++) {
@@ -248,7 +246,7 @@ function drawActiveCanvas() {
 				ctx.fillStyle = "rgb(75,100,230)";
 			else
 				ctx.fillStyle = "rgb(235, 235, 235)";
-			ctx.fillRect(x*100+2, y*100+2, 98, 98);
+			ctx.fillRect(x*squareSize+1, y*squareSize+1, squareSize, squareSize);
 		}
 	}
 
@@ -264,7 +262,7 @@ function drawActiveCanvas() {
 				strokeColor = "rgb(0,0,0)";
 			else
 				strokeColor = "rgb(200,200,200)";
-			DrawWall(ctx, [0, x, y], strokeColor);
+			DrawWall(ctx, [0, x, y], squareSize, strokeColor);
 		}
 	}
 	
@@ -275,7 +273,7 @@ function drawActiveCanvas() {
 				strokeColor = "rgb(0,0,0)";
 			else
 				strokeColor = "rgb(200,200,200)";
-			DrawWall(ctx, [1, x, y], strokeColor);
+			DrawWall(ctx, [1, x, y], squareSize, strokeColor);
 		}
 	}
 	
@@ -286,17 +284,17 @@ function drawActiveCanvas() {
 
 }
 
-function DrawWall(ctx, wall, color) {
+function DrawWall(ctx, wall, length, color) {
 	
 	if (wall == [])
 		return;
 		
 	ctx.strokeStyle = color;
 	if (wall[0] == 0) {
-		ctx.strokeRect(wall[1]*100, wall[2]*100, 100, 2);
+		ctx.strokeRect(wall[1]*length, wall[2]*length, length, 2);
 	}
 	if (wall[0] == 1) {
-		ctx.strokeRect(wall[2]*100, wall[1]*100, 2, 100);
+		ctx.strokeRect(wall[2]*length, wall[1]*length, 2, length);
 	}
 }
 
@@ -457,10 +455,10 @@ function AnimatedRotateRight(ctx, img) {
 function singleRotate(ctx, img, angle) {
 
 	//clear background to white first
-	ctx.fillStyle = "rgb(255,255,255)";
+	//ctx.fillStyle = "rgb(255,255,255)";
 	
 	// additional pixel buffer to eliminate artifact lines
-	ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
+	//ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
 	
 	ctx.translate(150,150);
 	ctx.rotate(angle * Math.PI/180);
@@ -550,6 +548,14 @@ function GetWallFromCoordinates(x, y) {
 		}
 	}
 	return null;
+}
+
+var origin = new Image();
+origin.src = "origin.png";
+
+function showOrigin() {
+	var ctx = getActiveContext();
+	ctx.drawImage(origin,0,0);
 }
 
 
