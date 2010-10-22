@@ -391,7 +391,7 @@ function RotateLeft() {
 	
 	AnimatedRotateLeft(ctx, img);
 	
-	if(CatMode != 1)
+	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayLeft();},500);
 }
 
@@ -405,9 +405,10 @@ function RotateRight() {
 	
 	AnimatedRotateRight(ctx, img);
 
-	if(CatMode != 1)
+	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayRight();},500);
 }
+
 
 function AnimatedRotate(ctx, img, clockwise) {
 	var steps = 5;
