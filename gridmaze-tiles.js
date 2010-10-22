@@ -101,11 +101,8 @@ function Tile(canvas, walls) {
 	this.getVerticalWalls = function() {
 		return walls[1];
 	}
-	this.setHorizontalWalls = function(wallsArrayH) {
-		this.walls[0] = wallsArrayH;
-	}
-	this.setVerticalWalls = function(wallsArrayV) {
-		this.walls[1] = wallsArrayV;
+	this.setWalls = function(wallsArray) {
+		this.walls = wallsArray;
 	}
 	this.toString = function() {
 		return "I exist";
@@ -346,8 +343,7 @@ function RotateWallsArrayLeft() {
 		newWalls[0][x].reverse();
 	}
 
-	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
-	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
+	Tiles[activeTileID].setWalls(newWalls);
 }
 
 function RotateWallsArrayRight() {
@@ -370,8 +366,7 @@ function RotateWallsArrayRight() {
 		newWalls[1][x].reverse();
 	}
 	
-	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
-	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
+	Tiles[activeTileID].setWalls(newWalls);
 }
 
 
@@ -384,7 +379,6 @@ function RotateLeft() {
 // called by "Rotate Left" button
 
 	var ctx = getActiveContext();
-	ctx.save();
 	
 	var img = new Image();
 	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
