@@ -426,16 +426,30 @@ function AnimatedRotate(ctx, img, clockwise) {
 	}
 	
 	ctx.save();
-	rotorClosure();	
+	
+	// It may seem unnecessary to use a 0 setTimeout here and
+	// you could just call rotorClosure() directly.  But
+	// Firefox has an apparent bug in the HTML canvas.  Seems 
+	// if get your image with getCanvas().toDataURL(...) and try
+	// to draw it without first returning to the main loop there
+	// can be problems.
+	//
+	// Some people work around this with try/catch:
+	//
+	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
+	//
+	// But accepting the timeout here since we're already queueing
+	// an animation is the easiest thing to do, and it seems to work
+	window.setTimeout(rotorClosure, 0);	
 }
 
 function AnimatedRotateLeft(ctx, img) {
-	print('output', 'Animating counter-clockwise rotation, yo!');
+	print('output', 'Animating counter-clockwise rotation!');
 	AnimatedRotate(ctx, img, false);
 }
 
 function AnimatedRotateRight(ctx, img) {
-	print('output', 'Animating clockwise rotation, yo!');
+	print('output', 'Animating clockwise rotation!');
 	AnimatedRotate(ctx, img, true);
 }
 
@@ -451,15 +465,9 @@ function singleRotate(ctx, img, angle) {
 	ctx.rotate(angle * Math.PI/180);
 	ctx.translate(-150,-150);
 	
-	// Firefox has an apparent timing bug in the HTML canvas.
-	// This workaround will only use a timing hack if the call to drawImage fails
-	// (If that call fails too we'd be out of luck, but it seems to work)
+	// If this fails on Firefox, see comments regarding rotorClosure
 	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
-	try {
-		ctx.drawImage(img, 0, 0);
-	} catch (e) {
-		window.setTimeout(function() { ctx.drawImage(img, 0, 0) }, 0);
-	}
+	ctx.drawImage(img, 0, 0);
 }
 
 
