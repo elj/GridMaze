@@ -196,7 +196,7 @@ function getActiveContext() {
 	var canvas;
 	
 	if(Tiles[activeTileID].getCanvas()) {
-		print('output', "Active Tile = " + activeTileID);
+		// print('output', "Active Tile = " + activeTileID);
 		canvas = Tiles[activeTileID].getCanvas();
 	} else {
 		print('output', "No canvas!");
@@ -212,7 +212,7 @@ function getActiveCanvas() {
 	var canvas;
 	
 	if(Tiles[activeTileID].getCanvas()) {
-		print('output', "Active Tile = " + activeTileID);
+		// print('output', "Active Tile = " + activeTileID);
 		return Tiles[activeTileID].getCanvas();
 	} else {
 		print('output', "No canvas!");
@@ -225,15 +225,16 @@ function getActiveCanvas() {
 ** Draw Current Walls and Squares **
 \**********************************/
 
-
-function drawActiveCanvas() {
+function drawActiveCanvasCore(erase) {
 	
 	var canvas = getActiveCanvas();
 	var ctx = canvas.getContext("2d");
 	
 	// set fillStyle to white and fill canvas background
-	ctx.fillStyle = "rgb(255,255,255)";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	if (erase) {
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.fillRect(0, 0, canvas.width, canvas.height);
+	}
  
 	// generate 3x3 array describing whether tiles are enclosed (t) or not (f)
 	var FilledIn = CalculateSquaresArray();
@@ -281,7 +282,10 @@ function drawActiveCanvas() {
 	
 	print('horizontalwall', '0:[' + Walls[0][0] + ']1:[' + Walls[0][1] + ']2:[' + Walls[0][2] + ']');
 	print('verticalwall', '0:[' + Walls[1][0] + ']1:[' + Walls[1][1] + ']2:[' + Walls[1][2] + ']');
+}
 
+function drawActiveCanvas() {
+	drawActiveCanvasCore(false);
 }
 
 function DrawWall(ctx, wall, length, color) {
@@ -325,10 +329,10 @@ function IsSurroundedByWalls(x, y) {
 
 
 function RotateWallsArrayLeft() {
-// rotate the entire array of walls counter-clockwise, and draw to canvas
+// rotate the entire array of walls counter-clockwise, without drawing
 // Walls[0] = Horizontal, [1] = Vertical
 
-	print('output', 'Rotating Walls Array counter-clockwise!');
+ 	print('output', 'Rotating Walls Array counter-clockwise!');
 	
 	var oWalls = Tiles[activeTileID].getWalls();
 	var newWalls = [oWalls[1], oWalls[0]];
@@ -344,12 +348,10 @@ function RotateWallsArrayLeft() {
 
 	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
 	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
-	
-	drawActiveCanvas();
 }
 
 function RotateWallsArrayRight() {
-// rotate the entire array of walls clockwise, and draw to canvas
+// rotate the entire array of walls clockwise, without drawing
 // Walls[0] = Horizontal, [1] = Vertical
 
 	print('output', 'Rotating Walls Array clockwise!');
@@ -370,8 +372,6 @@ function RotateWallsArrayRight() {
 	
 	Tiles[activeTileID].setHorizontalWalls(newWalls[0]);
 	Tiles[activeTileID].setVerticalWalls(newWalls[1]);
-	
-	drawActiveCanvas();
 }
 
 
@@ -399,7 +399,6 @@ function RotateRight() {
 // called by "Rotate Right" button
 
 	var ctx = getActiveContext();
-	ctx.save();
 	
 	var img = new Image();
 	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
@@ -410,68 +409,58 @@ function RotateRight() {
 		setTimeout(function(){RotateWallsArrayRight();},500);
 }
 
-
-function AnimatedRotateLeft(ctx, img) {
+function AnimatedRotate(ctx, img, clockwise) {
+	var steps = 5;
 	
-	print('output', 'Animating counter-clockwise rotation!');
-
-	// animated rotation for 75 degrees
-	singleRotate(ctx, img, -15);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 100);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 200);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 300);
-	setTimeout(function(){singleRotate(ctx,img,-15);}, 400);
-	// re-drawing walls is the final "move", no more rotating here
+	var rotorClosure = function() {
+		if (steps > 0) {
+			// animated rotation for 75 degrees
+			singleRotate(ctx, img, clockwise ? 15 : -15);
+			window.setTimeout(rotorClosure, 100);
+			steps--;
+		} else {
+			// re-drawing walls as the final "move"
+			ctx.restore();
+			drawActiveCanvas();
+		}
+	}
 	
-	if(CatMode == 1)
-		setTimeout(function(){singleRotate(ctx,img,-15);},425);
-
-	setTimeout(function(){RestoreCanvasContext(ctx);},450);
-		
-	
-
+	ctx.save();
+	rotorClosure();	
 }
 
+function AnimatedRotateLeft(ctx, img) {
+	print('output', 'Animating counter-clockwise rotation, yo!');
+	AnimatedRotate(ctx, img, false);
+}
 
 function AnimatedRotateRight(ctx, img) {
-
-	print('output', 'Animating clockwise rotation!');
-
-	// animated rotation for 75 degrees
-	singleRotate(ctx, img, 15);
-	setTimeout(function(){singleRotate(ctx,img,15);}, 100);
-	setTimeout(function(){singleRotate(ctx,img,15);}, 200);
-	setTimeout(function(){singleRotate(ctx,img,15);}, 300);
-	setTimeout(function(){singleRotate(ctx,img,15);}, 400);
-	// re-drawing walls is the final "move", no more rotating here
-	
-	if(CatMode == 1)
-		setTimeout(function(){singleRotate(ctx,img,15);},425);
-		
-	setTimeout(function(){RestoreCanvasContext(ctx);},450);
-
+	print('output', 'Animating clockwise rotation, yo!');
+	AnimatedRotate(ctx, img, true);
 }
 
 function singleRotate(ctx, img, angle) {
 
 	//clear background to white first
-	//ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillStyle = "rgb(255,255,255)";
 	
 	// additional pixel buffer to eliminate artifact lines
-	//ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
+	ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
 	
 	ctx.translate(150,150);
 	ctx.rotate(angle * Math.PI/180);
 	ctx.translate(-150,-150);
-	ctx.drawImage(img,0,0);
-
+	
+	// Firefox has an apparent timing bug in the HTML canvas.
+	// This workaround will only use a timing hack if the call to drawImage fails
+	// (If that call fails too we'd be out of luck, but it seems to work)
+	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
+	try {
+		ctx.drawImage(img, 0, 0);
+	} catch (e) {
+		window.setTimeout(function() { ctx.drawImage(img, 0, 0) }, 0);
+	}
 }
-
-function RestoreCanvasContext(ctx) {
-// necessary for restoring saved canvas context states within a setTimeout() call
-	ctx.restore();
-}
-
 
 
 
