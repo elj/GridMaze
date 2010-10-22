@@ -6,13 +6,17 @@
     </head>
     <body onload="setMultigridEnvironment()">
     	
-        <canvas id="canvas00" width="302" height="302" margin="0" padding="0" border="0"></canvas>
-        <canvas id="canvas10" width="302" height="302" margin="0" padding="0" border="0"></canvas>
-        <canvas id="canvas20" width="302" height="302" margin="0" padding="0" border="0"></canvas>
+        <canvas id="canvas00" width="201" height="201" margin="0" padding="0" border="0"></canvas>
+        <canvas id="canvas10" width="201" height="201" margin="0" padding="0" border="0"></canvas>
+        <canvas id="canvas20" width="201" height="201" margin="0" padding="0" border="0"></canvas>
         <br />
-        <canvas id="canvas01" width="302" height="302"></canvas>
-        <canvas id="canvas11" width="302" height="302"></canvas>
-        <canvas id="canvas21" width="302" height="302"></canvas>
+        <canvas id="canvas01" width="201" height="201"></canvas>
+        <canvas id="canvas11" width="201" height="201"></canvas>
+        <canvas id="canvas21" width="201" height="201"></canvas>
+        <br />
+        <canvas id="canvas02" width="201" height="201"></canvas>
+        <canvas id="canvas12" width="201" height="201"></canvas>
+        <canvas id="canvas22" width="201" height="201"></canvas>
         <br />
         Click on one of the six "tiles", then click the rotate buttons below!<br />
         <button onClick="RotateLeft()">Rotate Left</button>
@@ -46,9 +50,8 @@
 				<li>Indicate which canvas is active</li>
 				<li>Rotate individual tiles - only works once per canvas on Safari, when hosted</li>
 				<li>Rework rotating to remove getImageData()</li>
-				<li>Make coordinate math work on any canvas size - test alternate sizes</li>
+				<li>Make coordinate math work on any canvas size - probably still need to adjust wall thickness</li>
 				<li>Re-implement cat mode</li>
-				<li>Add another row of Tiles</li>
 			</ul>
 		<h2>Phase Next:</h2>
 			<ul>

@@ -459,11 +459,14 @@ function singleRotate(ctx, img, angle) {
 	ctx.fillStyle = "rgb(255,255,255)";
 	
 	// additional pixel buffer to eliminate artifact lines
-	ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
+	ctx.fillRect(-1, -1, getActiveCanvas().width+2, getActiveCanvas().height+2);
 	
-	ctx.translate(150,150);
+	var horizontalCenter = getActiveCanvas().width/2;
+	var verticalCenter = getActiveCanvas().height/2;
+	
+	ctx.translate(horizontalCenter,verticalCenter);
 	ctx.rotate(angle * Math.PI/180);
-	ctx.translate(-150,-150);
+	ctx.translate(horizontalCenter*-1,verticalCenter*-1);
 	
 	// If this fails on Firefox, see comments regarding rotorClosure
 	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
