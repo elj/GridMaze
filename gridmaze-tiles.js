@@ -391,7 +391,7 @@ function RotateLeft() {
 	
 	AnimatedRotateLeft(ctx, img);
 	
-	if(CatMode != 1)
+	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayLeft();},500);
 }
 
@@ -406,7 +406,7 @@ function RotateRight() {
 	
 	AnimatedRotateRight(ctx, img);
 
-	if(CatMode != 1)
+	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayRight();},500);
 }
 
@@ -423,10 +423,11 @@ function AnimatedRotateLeft(ctx, img) {
 	setTimeout(function(){singleRotate(ctx,img,-15);}, 400);
 	// re-drawing walls is the final "move", no more rotating here
 	
-	if(CatMode == 1)
-		setTimeout(function(){singleRotate(ctx,img,-15);},425);
+	//if(CatMode == 1)
+	//	setTimeout(function(){singleRotate(ctx,img,-15);},425);
 
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
+	//setTimeout("alert()",451);
 		
 	
 
@@ -445,8 +446,8 @@ function AnimatedRotateRight(ctx, img) {
 	setTimeout(function(){singleRotate(ctx,img,15);}, 400);
 	// re-drawing walls is the final "move", no more rotating here
 	
-	if(CatMode == 1)
-		setTimeout(function(){singleRotate(ctx,img,15);},425);
+	//if(CatMode == 1)
+	//	setTimeout(function(){singleRotate(ctx,img,15);},425);
 		
 	setTimeout(function(){RestoreCanvasContext(ctx);},450);
 
@@ -455,10 +456,10 @@ function AnimatedRotateRight(ctx, img) {
 function singleRotate(ctx, img, angle) {
 
 	//clear background to white first
-	//ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillStyle = "rgb(255,255,255)";
 	
 	// additional pixel buffer to eliminate artifact lines
-	//ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
+	ctx.fillRect(-1, -1, Tiles[activeTileID].getCanvas().width+2, Tiles[activeTileID].getCanvas().height+2);
 	
 	ctx.translate(150,150);
 	ctx.rotate(angle * Math.PI/180);
@@ -555,7 +556,7 @@ origin.src = "origin.png";
 
 function showOrigin() {
 	var ctx = getActiveContext();
-	ctx.drawImage(origin,0,0);
+	ctx.drawImage(img,0,0);
 }
 
 
