@@ -385,9 +385,6 @@ function RotateLeft() {
 
 	var ctx = getActiveContext();
 	
-	//var img = new Image();
-	//img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
-	
 	AnimatedRotateLeft(ctx);
 	
 	//if(CatMode != 1)
@@ -398,9 +395,6 @@ function RotateRight() {
 // called by "Rotate Right" button
 
 	var ctx = getActiveContext();
-	
-	//var img = new Image();
-	//img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
 	
 	AnimatedRotateRight(ctx);
 
@@ -433,44 +427,8 @@ function AnimatedRotateByDrawing(ctx, clockwise) {
 	}
 	
 	window.setTimeout(rotorClosure, 0);
-	
-
 }
 
-
-function AnimatedRotate(ctx, img, clockwise) {
-	var steps = 5;
-	
-	var rotorClosure = function() {
-		if (steps > 0) {
-			// animated rotation for 75 degrees
-			singleRotate(ctx, img, clockwise ? 15 : -15);
-			window.setTimeout(rotorClosure, 100);
-			steps--;
-		} else {
-			// re-drawing walls as the final "move"
-			ctx.restore();
-			drawActiveCanvas();
-		}
-	}
-	
-	ctx.save();
-	
-	// It may seem unnecessary to use a 0 setTimeout here and
-	// you could just call rotorClosure() directly.  But
-	// Firefox has an apparent bug in the HTML canvas.  Seems 
-	// if get your image with getCanvas().toDataURL(...) and try
-	// to draw it without first returning to the main loop there
-	// can be problems.
-	//
-	// Some people work around this with try/catch:
-	//
-	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
-	//
-	// But accepting the timeout here since we're already queueing
-	// an animation is the easiest thing to do, and it seems to work
-	window.setTimeout(rotorClosure, 0);	
-}
 
 function AnimatedRotateLeft(ctx) {
 	print('output', 'Animating counter-clockwise rotation!');
@@ -481,28 +439,6 @@ function AnimatedRotateRight(ctx) {
 	print('output', 'Animating clockwise rotation!');
 	AnimatedRotateByDrawing(ctx, true);
 }
-
-function singleRotate(ctx, img, angle) {
-
-	//clear background to white first
-	ctx.fillStyle = "rgb(255,255,255)";
-	
-	// additional pixel buffer to eliminate artifact lines
-	ctx.fillRect(-1, -1, getActiveCanvas().width+2, getActiveCanvas().height+2);
-	
-	var horizontalCenter = getActiveCanvas().width/2;
-	var verticalCenter = getActiveCanvas().height/2;
-	
-	ctx.translate(horizontalCenter,verticalCenter);
-	ctx.rotate(angle * Math.PI/180);
-	ctx.translate(horizontalCenter*-1,verticalCenter*-1);
-	
-	// If this fails on Firefox, see comments regarding rotorClosure
-	// http://tinymce.moxiecode.com/punbb/viewtopic.php?pid=74384
-	ctx.drawImage(img, 0, 0);
-}
-
-
 
 
 /******************\
