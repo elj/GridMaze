@@ -385,10 +385,10 @@ function RotateLeft() {
 
 	var ctx = getActiveContext();
 	
-	var img = new Image();
-	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
+	//var img = new Image();
+	//img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
 	
-	AnimatedRotateLeft(ctx, img);
+	AnimatedRotateLeft(ctx);
 	
 	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayLeft();},500);
@@ -399,13 +399,42 @@ function RotateRight() {
 
 	var ctx = getActiveContext();
 	
-	var img = new Image();
-	img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
+	//var img = new Image();
+	//img.src = Tiles[activeTileID].getCanvas().toDataURL("image/png");
 	
-	AnimatedRotateRight(ctx, img);
+	AnimatedRotateRight(ctx);
 
 	//if(CatMode != 1)
 		setTimeout(function(){RotateWallsArrayRight();},500);
+}
+
+function AnimatedRotateByDrawing(ctx, clockwise) {
+	var steps = 5;
+	
+	ctx.save();
+	
+	var horizontalCenter = getActiveCanvas().width/2;
+	var verticalCenter = getActiveCanvas().height/2;
+	
+	var rotorClosure = function() {
+		if(steps > 0) {	
+			ctx.translate(horizontalCenter,verticalCenter);
+			ctx.rotate((clockwise ? 15 : -15) * Math.PI/180);
+			ctx.translate(horizontalCenter*-1,verticalCenter*-1);
+			
+			drawActiveCanvasCore(true);
+			
+			window.setTimeout(rotorClosure, 100);
+			steps--;
+		} else {
+			ctx.restore();
+			drawActiveCanvasCore(true);
+		}
+	}
+	
+	window.setTimeout(rotorClosure, 0);
+	
+
 }
 
 
@@ -443,14 +472,14 @@ function AnimatedRotate(ctx, img, clockwise) {
 	window.setTimeout(rotorClosure, 0);	
 }
 
-function AnimatedRotateLeft(ctx, img) {
+function AnimatedRotateLeft(ctx) {
 	print('output', 'Animating counter-clockwise rotation!');
-	AnimatedRotate(ctx, img, false);
+	AnimatedRotateByDrawing(ctx, false);
 }
 
-function AnimatedRotateRight(ctx, img) {
+function AnimatedRotateRight(ctx) {
 	print('output', 'Animating clockwise rotation!');
-	AnimatedRotate(ctx, img, true);
+	AnimatedRotateByDrawing(ctx, true);
 }
 
 function singleRotate(ctx, img, angle) {
