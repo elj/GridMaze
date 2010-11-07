@@ -447,13 +447,13 @@ function AnimatedRotateRight(ctx) {
 
 function setClickedTileActive(t) {
 
-	//var oldCanvasID = Tiles[activeTileID].getCanvas().id;
-	//document.getElementById(oldCanvasID).style = "border:0px";
+	var oldCanvasID = Tiles[activeTileID].getCanvas().id;
+	document.getElementById(oldCanvasID).style.border = "3px solid white";
 	
 	activeTileID = t;
 	
-	//var newCanvasID = Tiles[activeTileID].getCanvas().id;
-	//document.getElementById(newCanvasID).style = "border:2px solid red";
+	var newCanvasID = Tiles[activeTileID].getCanvas().id;
+	document.getElementById(newCanvasID).style.border = "3px dotted red";
 	
 	
 	print('output', "Clicked Tile = " + t);
